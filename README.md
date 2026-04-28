@@ -145,3 +145,13 @@ The project is successful if the tool can ingest a server log folder and reliabl
 - Detect suspicious commands
 - Generate reports
 
+## Current Tool Features
+- Reads Minecraft server logs
+- Detects suspicious admin commands
+- Flags possible insider threat activity
+- Uses sample evidence logs for testing
+
+## Commands Flagged
+- /give
+- /op
+- /gamemode
