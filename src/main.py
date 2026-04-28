@@ -1,0 +1,1 @@
+print("BlockWatch project initialized.")
