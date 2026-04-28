@@ -134,3 +134,14 @@ The project is successful if the tool can ingest a server log folder and reliabl
 1) an evidence package with hashes, and  
 2) a timeline + suspicious admin activity report that supports an incident investigation.
 
+## Current Progress
+- Repository initialized
+- Source code folder created
+- Sample Minecraft log data uploaded
+- Final report draft started
+
+## Next Steps
+- Build parser for log analysis
+- Detect suspicious commands
+- Generate reports
+
