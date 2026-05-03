@@ -28,8 +28,8 @@ SUSPICIOUS_COMMANDS = [
     "Set own game mode",
     "Set game mode",
     "Teleported",
-    "server operator",
     "no longer a server operator",
+    "server operator",
     "Banned",
     "Unbanned",
     "Kicked",
@@ -108,7 +108,7 @@ def scan_log_file(log_path):
                         "risk": classify_risk(command),
                         "log_entry": clean_line
                     })
-
+                    break
     return flagged_events
 
 
