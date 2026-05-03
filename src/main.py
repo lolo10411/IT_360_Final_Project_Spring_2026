@@ -1,5 +1,6 @@
 import os
 import hashlib
+import argparse
 from datetime import datetime
 
 try:
@@ -111,7 +112,15 @@ def generate_report(flagged_events, evidence_file, evidence_hash, output_path):
 
 
 def main():
-    log_path = "data/sample_log.txt"
+    parser = argparse.ArgumentParser(description="BlockWatch Minecraft Insider Threat Scanner")
+    parser.add_argument(
+        "--log",
+        default="data/sample_log.txt",
+        help="Path to the Minecraft server log file to analyze"
+    )
+    args = parser.parse_args()
+
+    log_path = args.log
     output_dir = "output"
     output_report = os.path.join(output_dir, "suspicious_activity_report.txt")
 
