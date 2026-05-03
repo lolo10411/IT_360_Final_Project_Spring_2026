@@ -6,31 +6,34 @@ except ImportError:
     OpenAI = None
 
 
-def analyze_with_chatgpt(log_line):
+def analyze_with_chatgpt(log_entry):
     """
-    Sends a suspicious Minecraft log event to ChatGPT/OpenAI
-    and returns a forensic-style analysis.
+    Uses the OpenAI API to provide AI-assisted forensic analysis
+    of a suspicious Minecraft server log entry.
+
+    This feature is optional. If no API key is configured, the tool
+    still runs and clearly reports that AI analysis was skipped.
     """
+
+    if OpenAI is None:
+        return "AI analysis unavailable: OpenAI package is not installed."
 
     api_key = os.getenv("OPENAI_API_KEY")
 
-    if OpenAI is None:
-        return "OpenAI package is not installed. Run: pip install -r requirements.txt"
-
     if not api_key:
-        return "No OPENAI_API_KEY found. AI analysis skipped."
+        return "AI analysis skipped: OPENAI_API_KEY environment variable is not set."
 
     client = OpenAI(api_key=api_key)
 
     prompt = f"""
 You are a digital forensics assistant analyzing Minecraft server logs for insider threat activity.
 
-Analyze this suspicious log event:
-{log_line}
+Suspicious log entry:
+{log_entry}
 
-Return:
+Provide:
 1. Risk level: Low, Medium, or High
-2. Why this event may matter in an insider threat investigation
+2. Why this event matters in an insider threat investigation
 3. Recommended follow-up evidence to review
 
 Keep the response concise and professional.
