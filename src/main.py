@@ -90,6 +90,15 @@ def generate_report(flagged_events, evidence_file, evidence_hash, output_path):
         report.write("Summary\n")
         report.write("-" * 20 + "\n")
         report.write(f"Total suspicious events detected: {len(flagged_events)}\n\n")
+        command_counts = count_commands(flagged_events)
+
+        report.write("Command Summary\n")
+        report.write("-" * 20 + "\n")
+
+        for command, count in command_counts.items():
+            report.write(f"{command}: {count}\n")
+
+        report.write("\n")
 
         if not flagged_events:
             report.write("No suspicious events were detected.\n")
@@ -129,6 +138,18 @@ def generate_csv_timeline(flagged_events, output_path):
                 "log_entry": event["log_entry"]
             })
             
+def count_commands(flagged_events):
+    """
+    Counts how many times each suspicious command appears.
+    """
+    command_counts = {}
+
+    for event in flagged_events:
+        command = event["command"]
+        command_counts[command] = command_counts.get(command, 0) + 1
+
+    return command_counts
+    
 def main():
     parser = argparse.ArgumentParser(description="BlockWatch Minecraft Insider Threat Scanner")
     parser.add_argument(
