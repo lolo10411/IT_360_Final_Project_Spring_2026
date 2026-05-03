@@ -1,6 +1,7 @@
 import os
 import hashlib
 import argparse
+import csv
 from datetime import datetime
 
 try:
@@ -110,7 +111,24 @@ def generate_report(flagged_events, evidence_file, evidence_hash, output_path):
 
             report.write("-" * 45 + "\n")
 
+def generate_csv_timeline(flagged_events, output_path):
+    """
+    Generates a CSV timeline of flagged suspicious events.
+    """
+    with open(output_path, "w", newline="", encoding="utf-8") as csvfile:
+        fieldnames = ["line_number", "command", "risk", "log_entry"]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
+        writer.writeheader()
+
+        for event in flagged_events:
+            writer.writerow({
+                "line_number": event["line_number"],
+                "command": event["command"],
+                "risk": event["risk"],
+                "log_entry": event["log_entry"]
+            })
+            
 def main():
     parser = argparse.ArgumentParser(description="BlockWatch Minecraft Insider Threat Scanner")
     parser.add_argument(
@@ -123,6 +141,7 @@ def main():
     log_path = args.log
     output_dir = "output"
     output_report = os.path.join(output_dir, "suspicious_activity_report.txt")
+    output_csv = os.path.join(output_dir, "timeline.csv")
 
     print("=== BlockWatch Minecraft Insider Threat Scanner ===\n")
 
@@ -147,6 +166,8 @@ def main():
         print("-" * 50)
 
     generate_report(flagged_events, log_path, evidence_hash, output_report)
+    generate_csv_timeline(flagged_events, output_csv)
+    print(f"CSV timeline generated: {output_csv}")
 
     print(f"\nReport generated: {output_report}")
     print("\n=== Scan Complete ===")
