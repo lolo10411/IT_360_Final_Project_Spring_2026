@@ -75,7 +75,7 @@ def scan_log_file(log_path):
     return flagged_events
 
 
-def generate_report(flagged_events, evidence_file, evidence_hash, output_path):
+def generate_report(flagged_events, evidence_file, evidence_hash, output_path, use_ai=True):
     """
     Generates a text report containing suspicious events found in the log file.
     """
@@ -113,7 +113,7 @@ def generate_report(flagged_events, evidence_file, evidence_hash, output_path):
             report.write(f"Risk Level: {event['risk']}\n")
             report.write(f"Log Entry: {event['log_entry']}\n")
 
-            if analyze_with_chatgpt:
+            if use_ai and analyze_with_chatgpt:
                 ai_result = analyze_with_chatgpt(event["log_entry"])
                 report.write("\nAI-Assisted Analysis:\n")
                 report.write(ai_result + "\n")
@@ -162,6 +162,11 @@ def main():
         default="output",
         help="Directory where generated reports will be saved"
     )
+    parser.add_argument(
+        "--no-ai",
+        action="store_true",
+        help="Disable AI-assisted analysis even if an API key is available"
+    )
     args = parser.parse_args()
 
     log_path = args.log
@@ -191,7 +196,7 @@ def main():
         print(f"Log Entry: {event['log_entry']}")
         print("-" * 50)
 
-    generate_report(flagged_events, log_path, evidence_hash, output_report)
+    generate_report(flagged_events, log_path, evidence_hash, output_report, use_ai=not args.no_ai)
     generate_csv_timeline(flagged_events, output_csv)
     print(f"CSV timeline generated: {output_csv}")
 
