@@ -11,6 +11,7 @@ except ImportError:
 
 
 SUSPICIOUS_COMMANDS = [
+    # Slash-command style entries from sample logs or some plugins
     "/give",
     "/op",
     "/deop",
@@ -18,9 +19,22 @@ SUSPICIOUS_COMMANDS = [
     "/tp",
     "/kill",
     "/ban",
-    "/pardon"
-]
+    "/pardon",
+    "/whitelist",
+    "/kick",
 
+    # Real Minecraft server log phrases
+    "Gave",
+    "Set own game mode",
+    "Set game mode",
+    "Teleported",
+    "server operator",
+    "no longer a server operator",
+    "Banned",
+    "Unbanned",
+    "Kicked",
+    "Whitelist"
+]
 
 def calculate_file_hash(file_path):
     """
@@ -39,14 +53,37 @@ def calculate_file_hash(file_path):
 
 def classify_risk(command):
     """
-    Assigns a basic risk level to suspicious Minecraft commands.
+    Assigns a basic risk level to suspicious Minecraft commands or real log phrases.
     """
-    high_risk_commands = ["/op", "/deop", "/ban", "/pardon"]
-    medium_risk_commands = ["/give", "/gamemode", "/tp", "/kill"]
+    high_risk_terms = [
+        "/op",
+        "/deop",
+        "/ban",
+        "/pardon",
+        "/whitelist",
+        "server operator",
+        "no longer a server operator",
+        "Banned",
+        "Unbanned",
+        "Whitelist"
+    ]
 
-    if command in high_risk_commands:
+    medium_risk_terms = [
+        "/give",
+        "/gamemode",
+        "/tp",
+        "/kill",
+        "/kick",
+        "Gave",
+        "Set own game mode",
+        "Set game mode",
+        "Teleported",
+        "Kicked"
+    ]
+
+    if command in high_risk_terms:
         return "High"
-    elif command in medium_risk_commands:
+    elif command in medium_risk_terms:
         return "Medium"
     else:
         return "Low"
