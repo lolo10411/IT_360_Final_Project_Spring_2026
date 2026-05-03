@@ -157,10 +157,15 @@ def main():
         default="data/sample_log.txt",
         help="Path to the Minecraft server log file to analyze"
     )
+    parser.add_argument(
+        "--output",
+        default="output",
+        help="Directory where generated reports will be saved"
+    )
     args = parser.parse_args()
 
     log_path = args.log
-    output_dir = "output"
+    output_dir = args.output
     output_report = os.path.join(output_dir, "suspicious_activity_report.txt")
     output_csv = os.path.join(output_dir, "timeline.csv")
 
