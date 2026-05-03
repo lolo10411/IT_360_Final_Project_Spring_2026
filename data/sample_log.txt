@@ -1,6 +1,12 @@
-[12:01:10] Logan joined the game
-[12:03:22] Abhi joined the game
-[12:05:33] Abhi issued server command: /give Logan diamond 64
-[12:06:10] Logan issued server command: /gamemode creative
-[12:08:15] Abhi issued server command: /op Logan
-[12:10:45] Logan left the game
+[12:01:10] [Server thread/INFO]: Logan joined the game
+[12:03:22] [Server thread/INFO]: Abhi joined the game
+[12:05:33] [Server thread/INFO]: Abhi issued server command: /give Logan diamond 64
+[12:06:10] [Server thread/INFO]: Logan issued server command: /gamemode creative
+[12:08:15] [Server thread/INFO]: Abhi issued server command: /op Logan
+[12:10:45] [Server thread/INFO]: Logan left the game
+[12:12:01] [Server thread/INFO]: Abhi issued server command: /tp Logan Abhi
+[12:13:40] [Server thread/INFO]: Abhi issued server command: /deop Logan
+[12:15:55] [Server thread/INFO]: Server backup completed
+[12:18:03] [Server thread/INFO]: Logan joined the game
+[12:20:17] [Server thread/INFO]: Abhi issued server command: /ban TestPlayer
+[12:22:30] [Server thread/INFO]: Logan left the game
