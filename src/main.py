@@ -1,19 +1,147 @@
-import re
+import os
+import hashlib
+from datetime import datetime
 
-log_file = "../data/sample_log.txt"
+try:
+    from ai_chatgpt_analyzer import analyze_with_chatgpt
+except ImportError:
+    analyze_with_chatgpt = None
 
-suspicious = ["/give", "/op", "/gamemode"]
 
-print("=== BlockWatch Scan Started ===\n")
+SUSPICIOUS_COMMANDS = [
+    "/give",
+    "/op",
+    "/deop",
+    "/gamemode",
+    "/tp",
+    "/kill",
+    "/ban",
+    "/pardon"
+]
 
-with open(log_file, "r") as file:
-    lines = file.readlines()
 
-for line in lines:
-    print("LOG:", line.strip())
+def calculate_file_hash(file_path):
+    """
+    Calculates a SHA-256 hash for the evidence file.
+    This supports forensic integrity by allowing investigators
+    to verify that the evidence file was not changed after collection.
+    """
+    sha256_hash = hashlib.sha256()
 
-    for command in suspicious:
-        if command in line:
-            print("ALERT: Suspicious command detected ->", command)
+    with open(file_path, "rb") as file:
+        for byte_block in iter(lambda: file.read(4096), b""):
+            sha256_hash.update(byte_block)
 
-print("\n=== Scan Complete ===")
+    return sha256_hash.hexdigest()
+
+
+def classify_risk(command):
+    """
+    Assigns a basic risk level to suspicious Minecraft commands.
+    """
+    high_risk_commands = ["/op", "/deop", "/ban", "/pardon"]
+    medium_risk_commands = ["/give", "/gamemode", "/tp", "/kill"]
+
+    if command in high_risk_commands:
+        return "High"
+    elif command in medium_risk_commands:
+        return "Medium"
+    else:
+        return "Low"
+
+
+def scan_log_file(log_path):
+    """
+    Scans a Minecraft server log file for suspicious administrative commands.
+    Returns a list of flagged events.
+    """
+    flagged_events = []
+
+    with open(log_path, "r", encoding="utf-8") as file:
+        for line_number, line in enumerate(file, start=1):
+            clean_line = line.strip()
+
+            for command in SUSPICIOUS_COMMANDS:
+                if command in clean_line:
+                    flagged_events.append({
+                        "line_number": line_number,
+                        "command": command,
+                        "risk": classify_risk(command),
+                        "log_entry": clean_line
+                    })
+
+    return flagged_events
+
+
+def generate_report(flagged_events, evidence_file, evidence_hash, output_path):
+    """
+    Generates a text report containing suspicious events found in the log file.
+    """
+    with open(output_path, "w", encoding="utf-8") as report:
+        report.write("BlockWatch Suspicious Activity Report\n")
+        report.write("=" * 45 + "\n\n")
+
+        report.write(f"Report Generated: {datetime.now()}\n")
+        report.write(f"Evidence File: {evidence_file}\n")
+        report.write(f"Evidence SHA-256: {evidence_hash}\n\n")
+
+        report.write("Summary\n")
+        report.write("-" * 20 + "\n")
+        report.write(f"Total suspicious events detected: {len(flagged_events)}\n\n")
+
+        if not flagged_events:
+            report.write("No suspicious events were detected.\n")
+            return
+
+        report.write("Flagged Events\n")
+        report.write("-" * 20 + "\n\n")
+
+        for event in flagged_events:
+            report.write(f"Line Number: {event['line_number']}\n")
+            report.write(f"Command Detected: {event['command']}\n")
+            report.write(f"Risk Level: {event['risk']}\n")
+            report.write(f"Log Entry: {event['log_entry']}\n")
+
+            if analyze_with_chatgpt:
+                ai_result = analyze_with_chatgpt(event["log_entry"])
+                report.write("\nAI-Assisted Analysis:\n")
+                report.write(ai_result + "\n")
+
+            report.write("-" * 45 + "\n")
+
+
+def main():
+    log_path = "data/sample_log.txt"
+    output_dir = "output"
+    output_report = os.path.join(output_dir, "suspicious_activity_report.txt")
+
+    print("=== BlockWatch Minecraft Insider Threat Scanner ===\n")
+
+    if not os.path.exists(log_path):
+        print(f"Error: Log file not found: {log_path}")
+        return
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    print(f"Scanning evidence file: {log_path}")
+
+    evidence_hash = calculate_file_hash(log_path)
+    print(f"Evidence SHA-256: {evidence_hash}\n")
+
+    flagged_events = scan_log_file(log_path)
+
+    print(f"Suspicious events detected: {len(flagged_events)}\n")
+
+    for event in flagged_events:
+        print(f"Line {event['line_number']} | {event['risk']} Risk | {event['command']}")
+        print(f"Log Entry: {event['log_entry']}")
+        print("-" * 50)
+
+    generate_report(flagged_events, log_path, evidence_hash, output_report)
+
+    print(f"\nReport generated: {output_report}")
+    print("\n=== Scan Complete ===")
+
+
+if __name__ == "__main__":
+    main()
