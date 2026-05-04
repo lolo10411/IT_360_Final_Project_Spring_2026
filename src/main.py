@@ -155,7 +155,28 @@ def scan_log_file(log_path):
                     break
     return flagged_events
 
+def write_incident_timeline(report, flagged_events):
+    """
+    Writes a chronological incident timeline section to the report.
+    The original log order is preserved, which is appropriate for Minecraft latest.log.
+    """
+    report.write("Incident Timeline\n")
+    report.write("-" * 20 + "\n")
 
+    if not flagged_events:
+        report.write("No suspicious events available for timeline reconstruction.\n\n")
+        return
+
+    for event in flagged_events:
+        report.write(
+            f"{event['timestamp']} | "
+            f"Actor: {event['actor']} | "
+            f"Risk: {event['risk']} | "
+            f"Event: {event['command']}\n"
+        )
+
+    report.write("\n")
+    
 def generate_report(flagged_events, evidence_file, evidence_hash, output_path, use_ai=True):
     """
     Generates a text report containing suspicious events found in the log file.
@@ -194,6 +215,8 @@ def generate_report(flagged_events, evidence_file, evidence_hash, output_path, u
             report.write("No suspicious events were detected.\n")
             return
 
+        write_incident_timeline(report, flagged_events)
+        
         report.write("Flagged Events\n")
         report.write("-" * 20 + "\n\n")
 
@@ -217,7 +240,7 @@ def generate_csv_timeline(flagged_events, output_path):
     Generates a CSV timeline of flagged suspicious events.
     """
     with open(output_path, "w", newline="", encoding="utf-8") as csvfile:
-        fieldnames = ["line_number", "command", "risk", "log_entry"]
+        fieldnames = ["line_number", "timestamp", "actor", "command", "risk", "log_entry"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
@@ -225,6 +248,8 @@ def generate_csv_timeline(flagged_events, output_path):
         for event in flagged_events:
             writer.writerow({
                 "line_number": event["line_number"],
+                "timestamp": event["timestamp"],
+                 "actor": event["actor"],
                 "command": event["command"],
                 "risk": event["risk"],
                 "log_entry": event["log_entry"]
