@@ -102,6 +102,34 @@ def extract_timestamp(log_entry):
         return match.group(1)
 
     return "Unknown"
+
+def extract_actor(log_entry):
+    """
+    Attempts to extract the player or actor responsible for a log event.
+    Supports common Minecraft log formats.
+    """
+
+    # Format: [playername: action]
+    bracket_actor = re.search(r"\[([A-Za-z0-9_]+):", log_entry)
+    if bracket_actor:
+        return bracket_actor.group(1)
+
+    # Format: Made player a server operator
+    made_operator = re.search(r"Made ([A-Za-z0-9_]+)", log_entry)
+    if made_operator:
+        return "Server/Console"
+
+    # Format: player joined the game
+    joined = re.search(r": ([A-Za-z0-9_]+) joined the game", log_entry)
+    if joined:
+        return joined.group(1)
+
+    # Format: player left the game
+    left = re.search(r": ([A-Za-z0-9_]+) left the game", log_entry)
+    if left:
+        return left.group(1)
+
+    return "Unknown"
     
 def scan_log_file(log_path):
     """
@@ -119,6 +147,7 @@ def scan_log_file(log_path):
                     flagged_events.append({
                         "line_number": line_number,
                         "timestamp": extract_timestamp(clean_line),
+                        "actor": extract_actor(clean_line),
                         "command": command,
                         "risk": classify_risk(command),
                         "log_entry": clean_line
@@ -162,6 +191,7 @@ def generate_report(flagged_events, evidence_file, evidence_hash, output_path, u
         for event in flagged_events:
             report.write(f"Line Number: {event['line_number']}\n")
             report.write(f"Timestamp: {event['timestamp']}\n")
+            report.write(f"Actor: {event['actor']}\n")
             report.write(f"Command Detected: {event['command']}\n")
             report.write(f"Risk Level: {event['risk']}\n")
             report.write(f"Log Entry: {event['log_entry']}\n")
@@ -245,7 +275,8 @@ def main():
     print(f"Suspicious events detected: {len(flagged_events)}\n")
 
     for event in flagged_events:
-        print(f"Line {event['line_number']} | {event['risk']} Risk | {event['command']}")
+       print(f"Line {event['line_number']} | {event['timestamp']} | {event['risk']} Risk | {event['command']}")
+        print(f"Actor: {event['actor']}")
         print(f"Log Entry: {event['log_entry']}")
         print("-" * 50)
 
