@@ -181,6 +181,15 @@ def generate_report(flagged_events, evidence_file, evidence_hash, output_path, u
 
         report.write("\n")
 
+        risk_counts = count_risk_levels(flagged_events)
+
+        report.write("Risk Summary\n")
+        report.write("-" * 20 + "\n")
+        report.write(f"High Risk Events: {risk_counts.get('High', 0)}\n")
+        report.write(f"Medium Risk Events: {risk_counts.get('Medium', 0)}\n")
+        report.write(f"Low Risk Events: {risk_counts.get('Low', 0)}\n")
+        report.write("\n")
+
         if not flagged_events:
             report.write("No suspicious events were detected.\n")
             return
@@ -232,6 +241,22 @@ def count_commands(flagged_events):
         command_counts[command] = command_counts.get(command, 0) + 1
 
     return command_counts
+    
+def count_risk_levels(flagged_events):
+    """
+    Counts flagged events by risk level.
+    """
+    risk_counts = {
+        "High": 0,
+        "Medium": 0,
+        "Low": 0
+    }
+
+    for event in flagged_events:
+        risk = event["risk"]
+        risk_counts[risk] = risk_counts.get(risk, 0) + 1
+
+    return risk_counts
     
 def main():
     parser = argparse.ArgumentParser(description="BlockWatch Minecraft Insider Threat Scanner")
