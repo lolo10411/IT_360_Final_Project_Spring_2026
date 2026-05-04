@@ -325,7 +325,7 @@ def main():
     print(f"Suspicious events detected: {len(flagged_events)}\n")
 
     for event in flagged_events:
-       print(f"Line {event['line_number']} | {event['timestamp']} | {event['risk']} Risk | {event['command']}")
+        print(f"Line {event['line_number']} | {event['timestamp']} | {event['risk']} Risk | {event['command']}")
         print(f"Actor: {event['actor']}")
         print(f"Log Entry: {event['log_entry']}")
         print("-" * 50)
