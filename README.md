@@ -55,6 +55,7 @@ Run with the sample log:
 ```bash
 py src/main.py --log data/sample_log.txt --output sample_test --no-ai
 
+---
 ## Suspicious Commands Detected
 
 BlockWatch currently flags the following Minecraft commands:
