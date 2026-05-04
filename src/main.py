@@ -2,6 +2,7 @@ import os
 import hashlib
 import argparse
 import csv
+import re
 from datetime import datetime
 
 try:
@@ -88,7 +89,20 @@ def classify_risk(command):
     else:
         return "Low"
 
+def extract_timestamp(log_entry):
+    """
+    Extracts the timestamp from a Minecraft log entry.
+    Example:
+    [18:12:38] [Server thread/INFO]: ...
+    returns 18:12:38
+    """
+    match = re.search(r"\[(\d{2}:\d{2}:\d{2})\]", log_entry)
 
+    if match:
+        return match.group(1)
+
+    return "Unknown"
+    
 def scan_log_file(log_path):
     """
     Scans a Minecraft server log file for suspicious administrative commands.
@@ -104,6 +118,7 @@ def scan_log_file(log_path):
                 if command in clean_line:
                     flagged_events.append({
                         "line_number": line_number,
+                        "timestamp": extract_timestamp(clean_line),
                         "command": command,
                         "risk": classify_risk(command),
                         "log_entry": clean_line
@@ -146,6 +161,7 @@ def generate_report(flagged_events, evidence_file, evidence_hash, output_path, u
 
         for event in flagged_events:
             report.write(f"Line Number: {event['line_number']}\n")
+            report.write(f"Timestamp: {event['timestamp']}\n")
             report.write(f"Command Detected: {event['command']}\n")
             report.write(f"Risk Level: {event['risk']}\n")
             report.write(f"Log Entry: {event['log_entry']}\n")
