@@ -35,7 +35,25 @@ BlockWatch currently includes the following features:
 - Uses sample Minecraft evidence logs for testing and demonstration
 
 ---
+## Current Functionality
 
+BlockWatch currently supports:
+
+- Scanning Minecraft server log files from a selected path
+- Detecting suspicious slash commands and real Minecraft log phrases
+- Assigning risk levels to flagged events
+- Calculating SHA-256 hashes for evidence integrity
+- Generating a suspicious activity report
+- Exporting a CSV timeline of flagged events
+- Optional AI-assisted analysis using the OpenAI API
+- Running with or without AI using the `--no-ai` option
+
+## Example Commands
+
+Run with the sample log:
+
+```bash
+py src/main.py --log data/sample_log.txt --output sample_test --no-ai
 ## Suspicious Commands Detected
 
 BlockWatch currently flags the following Minecraft commands:
