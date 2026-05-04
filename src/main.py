@@ -1,5 +1,4 @@
 import os
-import time
 import hashlib
 import argparse
 import csv
@@ -188,38 +187,6 @@ def count_commands(flagged_events):
 
     return command_counts
     
-def wait_for_log_inactivity(log_path, wait_seconds=30, check_interval=5):
-    """
-    Waits until the log file has not changed for a set period of time.
-    This can be used after a Minecraft server is stopped so BlockWatch
-    automatically scans the final saved log.
-    """
-    print(f"Watching log file for inactivity: {log_path}")
-    print(f"Waiting for {wait_seconds} seconds of no file changes...\n")
-
-    last_size = -1
-    inactive_time = 0
-
-    while inactive_time < wait_seconds:
-        if not os.path.exists(log_path):
-            print("Waiting for log file to exist...")
-            time.sleep(check_interval)
-            continue
-
-        current_size = os.path.getsize(log_path)
-
-        if current_size == last_size:
-            inactive_time += check_interval
-            print(f"No change detected for {inactive_time}/{wait_seconds} seconds...")
-        else:
-            inactive_time = 0
-            last_size = current_size
-            print("Log file changed. Resetting inactivity timer...")
-
-        time.sleep(check_interval)
-
-    print("\nLog file appears inactive. Starting forensic scan...\n")
-    
 def main():
     parser = argparse.ArgumentParser(description="BlockWatch Minecraft Insider Threat Scanner")
     parser.add_argument(
@@ -237,11 +204,6 @@ def main():
         action="store_true",
         help="Disable AI-assisted analysis even if an API key is available"
     )
-    parser.add_argument(
-        "--watch",
-        action="store_true",
-        help="Wait for the log file to stop changing before scanning"
-    )
     args = parser.parse_args()
 
     log_path = args.log
@@ -250,9 +212,6 @@ def main():
     output_csv = os.path.join(output_dir, "timeline.csv")
 
     print("=== BlockWatch Minecraft Insider Threat Scanner ===\n")
-
-    if args.watch:
-        wait_for_log_inactivity(log_path)
 
     if not os.path.exists(log_path):
         print(f"Error: Log file not found: {log_path}")
