@@ -376,6 +376,4 @@ Completed:
 
 ## Video Presentation
 
-## Video Presentation
-
 [BlockWatch Final Project Video](https://youtu.be/qjwzYgA6xRc)
