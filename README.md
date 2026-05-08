@@ -371,14 +371,11 @@ Completed:
 - Optional AI analysis module added
 - README documentation updated
 
-In progress:
-
-- Final written report
-- Screenshots for documentation
-- Video presentation
 
 ---
 
 ## Video Presentation
 
-Video link will be added before final submission.
+## Video Presentation
+
+[BlockWatch Final Project Video](https://youtu.be/qjwzYgA6xRc)
